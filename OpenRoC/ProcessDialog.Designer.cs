@@ -393,7 +393,7 @@
             // 
             // ProcessOptionsCancelButton
             // 
-            this.ProcessOptionsCancelButton.Location = new System.Drawing.Point(294, 209);
+            this.ProcessOptionsCancelButton.Location = new System.Drawing.Point(375, 209);
             this.ProcessOptionsCancelButton.Name = "ProcessOptionsCancelButton";
             this.ProcessOptionsCancelButton.Size = new System.Drawing.Size(75, 23);
             this.ProcessOptionsCancelButton.TabIndex = 11;
@@ -403,7 +403,7 @@
             // 
             // ProcessOptionsSaveButton
             // 
-            this.ProcessOptionsSaveButton.Location = new System.Drawing.Point(375, 209);
+            this.ProcessOptionsSaveButton.Location = new System.Drawing.Point(294, 209);
             this.ProcessOptionsSaveButton.Name = "ProcessOptionsSaveButton";
             this.ProcessOptionsSaveButton.Size = new System.Drawing.Size(75, 23);
             this.ProcessOptionsSaveButton.TabIndex = 10;
