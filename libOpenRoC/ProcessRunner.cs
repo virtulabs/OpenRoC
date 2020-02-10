@@ -8,15 +8,15 @@
 
     public class ProcessRunner : IDisposable, INotifyPropertyChanged
     {
-        Status currentState;
-        Status previousState;
-        Signal crashSignal;
-        Signal startSignal;
-        Signal checkSignal;
-        Signal resetTimer;
-        Timer gracePeriodTimer;
-        Timer doubleCheckTimer;
-        ProcessOptions options;
+        private Status currentState;
+        private Status previousState;
+        private Signal crashSignal;
+        private Signal startSignal;
+        private Signal checkSignal;
+        private Signal resetTimer;
+        private Timer gracePeriodTimer;
+        private Timer doubleCheckTimer;
+        private ProcessOptions options;
 
         public Action StateChanged;
         public Action OptionsChanged;
@@ -278,7 +278,7 @@
                 Start();
             }
 
-            if (previousState == Status.Running && Process != null)
+            if (previousState == Status.Running && Process != null && !Process.HasExited)
             {
                 if (currentState != Status.Running)
                 {
@@ -304,7 +304,7 @@
                     Start();
             }
 
-            if (currentState != Status.Disabled && HasWindow && Process != null)
+            if (currentState != Status.Disabled && HasWindow && Process != null && !Process.HasExited)
             {
                 Process.Refresh();
 
@@ -361,11 +361,14 @@
 
         private bool ShouldStart
         {
-            get { return (Process == null) &&
-                    (startSignal.IsSet ||
-                    (State == Status.Running &&
-                    options.CrashedIfNotRunning &&
-                    !gracePeriodTimer.Enabled)); }
+            get
+            {
+                return (Process == null) &&
+                  (startSignal.IsSet ||
+                  (State == Status.Running &&
+                  options.CrashedIfNotRunning &&
+                  !gracePeriodTimer.Enabled));
+            }
         }
 
         #region Event callbacks
@@ -400,10 +403,8 @@
 
             if (propertyName == nameof(State))
                 StateChanged?.Invoke();
-
             else if (propertyName == nameof(ProcessOptions))
                 OptionsChanged?.Invoke();
-
             else if (propertyName == nameof(Process))
                 ProcessChanged?.Invoke();
         }
