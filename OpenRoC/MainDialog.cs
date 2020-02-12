@@ -286,6 +286,22 @@
 
         #region Process right-click context menu event callbacks
 
+        private void openFolderInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ProcessListView.SelectedItems.Count > 1 || ProcessListView.SelectedItems.Count == 0)
+            {
+                openFolderInExplorerToolStripMenuItem.Visible = false;
+                return;
+            }
+
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = Path.GetDirectoryName(ProcessListView.SelectedItems[0].Name),
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+
         private void OnContextMenuEditButtonClick(object sender, EventArgs e)
         {
             if (ProcessListView.FocusedItem == null || ProcessListView.SelectedItems.Count == 0)

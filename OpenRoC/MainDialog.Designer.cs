@@ -65,6 +65,7 @@
             this.TaskbarContextMenuExitButton = new System.Windows.Forms.ToolStripMenuItem();
             this.MetricsChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.SensuInterfaceUpdateTimer = new System.Windows.Forms.Timer(this.components);
+            this.openFolderInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip.SuspendLayout();
             this.MenuStrip.SuspendLayout();
             this.RightClickContextMenuStrip.SuspendLayout();
@@ -171,6 +172,7 @@
             this.ProcessListView.FullRowSelect = true;
             this.ProcessListView.GridLines = true;
             this.ProcessListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.ProcessListView.HideSelection = false;
             this.ProcessListView.Location = new System.Drawing.Point(0, 22);
             this.ProcessListView.Name = "ProcessListView";
             this.ProcessListView.ShowGroups = false;
@@ -208,67 +210,68 @@
             this.ContextMenuSeparator2,
             this.ContextMenuStart,
             this.ContextMenuStop,
-            this.ContextMenuShow});
+            this.ContextMenuShow,
+            this.openFolderInExplorerToolStripMenuItem});
             this.RightClickContextMenuStrip.Name = "ContextMenuStrip";
             this.RightClickContextMenuStrip.ShowImageMargin = false;
-            this.RightClickContextMenuStrip.Size = new System.Drawing.Size(139, 170);
+            this.RightClickContextMenuStrip.Size = new System.Drawing.Size(172, 214);
             // 
             // ContextMenuAddButton
             // 
             this.ContextMenuAddButton.Name = "ContextMenuAddButton";
-            this.ContextMenuAddButton.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuAddButton.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuAddButton.Text = "Add";
             this.ContextMenuAddButton.Click += new System.EventHandler(this.OnAddButtonClick);
             // 
             // ContextMenuEditButton
             // 
             this.ContextMenuEditButton.Name = "ContextMenuEditButton";
-            this.ContextMenuEditButton.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuEditButton.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuEditButton.Text = "Edit";
             this.ContextMenuEditButton.Click += new System.EventHandler(this.OnContextMenuEditButtonClick);
             // 
             // ContextMenuSeparator1
             // 
             this.ContextMenuSeparator1.Name = "ContextMenuSeparator1";
-            this.ContextMenuSeparator1.Size = new System.Drawing.Size(135, 6);
+            this.ContextMenuSeparator1.Size = new System.Drawing.Size(168, 6);
             // 
             // ContextMenuDeleteButton
             // 
             this.ContextMenuDeleteButton.Name = "ContextMenuDeleteButton";
-            this.ContextMenuDeleteButton.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuDeleteButton.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuDeleteButton.Text = "Delete";
             this.ContextMenuDeleteButton.Click += new System.EventHandler(this.OnContextMenuDeleteButtonClick);
             // 
             // ContextMenuDisableButton
             // 
             this.ContextMenuDisableButton.Name = "ContextMenuDisableButton";
-            this.ContextMenuDisableButton.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuDisableButton.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuDisableButton.Text = "Disable";
             this.ContextMenuDisableButton.Click += new System.EventHandler(this.OnContextMenuDisableButtonClick);
             // 
             // ContextMenuSeparator2
             // 
             this.ContextMenuSeparator2.Name = "ContextMenuSeparator2";
-            this.ContextMenuSeparator2.Size = new System.Drawing.Size(135, 6);
+            this.ContextMenuSeparator2.Size = new System.Drawing.Size(168, 6);
             // 
             // ContextMenuStart
             // 
             this.ContextMenuStart.Name = "ContextMenuStart";
-            this.ContextMenuStart.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuStart.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuStart.Text = "Start Process(es)";
             this.ContextMenuStart.Click += new System.EventHandler(this.OnContextMenuStartClick);
             // 
             // ContextMenuStop
             // 
             this.ContextMenuStop.Name = "ContextMenuStop";
-            this.ContextMenuStop.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuStop.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuStop.Text = "Stop Process(es)";
             this.ContextMenuStop.Click += new System.EventHandler(this.OnContextMenuStopClick);
             // 
             // ContextMenuShow
             // 
             this.ContextMenuShow.Name = "ContextMenuShow";
-            this.ContextMenuShow.Size = new System.Drawing.Size(138, 22);
+            this.ContextMenuShow.Size = new System.Drawing.Size(171, 22);
             this.ContextMenuShow.Text = "Show Window(s)";
             this.ContextMenuShow.Click += new System.EventHandler(this.OnContextMenuShowClick);
             // 
@@ -382,6 +385,13 @@
             this.MetricsChart.TabStop = false;
             this.MetricsChart.Text = "Machine Metrics";
             // 
+            // openFolderInExplorerToolStripMenuItem
+            // 
+            this.openFolderInExplorerToolStripMenuItem.Name = "openFolderInExplorerToolStripMenuItem";
+            this.openFolderInExplorerToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.openFolderInExplorerToolStripMenuItem.Text = "Open folder in explorer";
+            this.openFolderInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openFolderInExplorerToolStripMenuItem_Click);
+            // 
             // MainDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -437,6 +447,7 @@
         private System.Windows.Forms.ToolStripMenuItem TaskbarContextMenuExitButton;
         private System.Windows.Forms.DataVisualization.Charting.Chart MetricsChart;
         private System.Windows.Forms.Timer SensuInterfaceUpdateTimer;
+        private System.Windows.Forms.ToolStripMenuItem openFolderInExplorerToolStripMenuItem;
     }
 }
 
