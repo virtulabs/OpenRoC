@@ -8,6 +8,7 @@
     {
         private readonly List<Task> pending;
         public Action<Exception> ExceptionReceived;
+        private readonly object _lock = new object();
 
         public ExecutorService()
         {
@@ -19,7 +20,7 @@
             if (IsDisposed)
                 return;
 
-            lock (this)
+            lock (_lock)
             {
                 pending.Add(Task.Run(() =>
                 {
@@ -35,7 +36,7 @@
             if (IsDisposed)
                 return;
 
-            lock (this)
+            lock (_lock)
             {
                 Task.WaitAll(pending.ToArray());
                 pending.ForEach(task => task.Dispose());
@@ -44,6 +45,7 @@
         }
 
         #region IDisposable Support
+
         public bool IsDisposed { get; private set; } = false;
 
         protected virtual void Dispose(bool disposing)
@@ -63,6 +65,7 @@
         {
             Dispose(true);
         }
+
         #endregion
     }
 }
