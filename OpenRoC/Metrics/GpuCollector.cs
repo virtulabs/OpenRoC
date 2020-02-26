@@ -1,27 +1,27 @@
 ﻿namespace oroc.Metrics
 {
-    using OpenHardwareMonitor.Hardware;
+	using OpenHardwareMonitor.Hardware;
 
-    public class GpuCollector : ICollector
-    {
-        public GpuCollector(Computer computer)
-            : base(GetFirstGpu(computer))
-        { /* no-op */ }
+	public class GpuCollector : ICollector
+	{
+		public GpuCollector(Computer computer)
+			: base(GetFirstGpu(computer))
+		{ /* no-op */ }
 
-        private static IHardware GetFirstGpu(Computer computer)
-        {
-            IHardware defaultHardware = null;
+		private static IHardware GetFirstGpu(Computer computer)
+		{
+			IHardware defaultHardware = null;
 
-            foreach (IHardware hardwareItem in computer.Hardware)
-            {
-                if (hardwareItem.HardwareType == HardwareType.GpuAti ||
-                    hardwareItem.HardwareType == HardwareType.GpuNvidia)
-                {
-                    defaultHardware = hardwareItem;
-                }
-            }
+			foreach (IHardware hardwareItem in computer.Hardware)
+			{
+				if (hardwareItem.HardwareType == HardwareType.GpuAti ||
+					hardwareItem.HardwareType == HardwareType.GpuNvidia)
+				{
+					defaultHardware = hardwareItem;
+				}
+			}
 
-            return defaultHardware;
-        }
-    }
+			return defaultHardware;
+		}
+	}
 }

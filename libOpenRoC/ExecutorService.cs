@@ -1,71 +1,76 @@
 ﻿namespace liboroc
 {
-    using System;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
+	using System;
+	using System.Collections.Generic;
+	using System.Threading.Tasks;
 
-    public class ExecutorService : IDisposable
-    {
-        private readonly List<Task> pending;
-        public Action<Exception> ExceptionReceived;
-        private readonly object _lock = new object();
+	public class ExecutorService : IDisposable
+	{
+		private readonly List<Task> pending;
+		public Action<Exception> ExceptionReceived;
+		private readonly object _lock = new object();
 
-        public ExecutorService()
-        {
-            pending = new List<Task>();
-        }
+		public ExecutorService()
+		{
+			pending = new List<Task>();
+		}
 
-        public void Accept(Action action)
-        {
-            if (IsDisposed)
-                return;
+		public void Accept(Action action)
+		{
+			if (IsDisposed)
+			{
+				return;
+			}
 
-            lock (_lock)
-            {
-                pending.Add(Task.Run(() =>
-                {
-                    try { action(); }
-                    catch (Exception ex)
-                    { ExceptionReceived?.Invoke(ex); }
-                }));
-            }
-        }
+			lock (_lock)
+			{
+				pending.Add(Task.Run(() =>
+				{
+					try
+					{ action(); }
+					catch (Exception ex)
+					{ ExceptionReceived?.Invoke(ex); }
+				}));
+			}
+		}
 
-        public void Wait()
-        {
-            if (IsDisposed)
-                return;
+		public void Wait()
+		{
+			if (IsDisposed)
+			{
+				return;
+			}
 
-            lock (_lock)
-            {
-                Task.WaitAll(pending.ToArray());
-                pending.ForEach(task => task.Dispose());
-                pending.Clear();
-            }
-        }
+			lock (_lock)
+			{
+				Task.WaitAll(pending.ToArray());
+				pending.ForEach(task => task.Dispose());
+				pending.Clear();
+			}
+		}
 
-        #region IDisposable Support
+		#region IDisposable Support
 
-        public bool IsDisposed { get; private set; } = false;
+		public bool IsDisposed { get; private set; } = false;
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    Wait();
-                }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!IsDisposed)
+			{
+				if (disposing)
+				{
+					Wait();
+				}
 
-                IsDisposed = true;
-            }
-        }
+				IsDisposed = true;
+			}
+		}
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+		public void Dispose()
+		{
+			Dispose(true);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

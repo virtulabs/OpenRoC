@@ -1,99 +1,99 @@
 ﻿namespace liboroc
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
-    public class ProcessManager : IDisposable
-    {
-        private Dictionary<string, ProcessRunner> processMap
-            = new Dictionary<string, ProcessRunner>();
+	public class ProcessManager : IDisposable
+	{
+		private Dictionary<string, ProcessRunner> processMap
+			= new Dictionary<string, ProcessRunner>();
 
-        public Action ProcessesChanged;
-        public Action<ProcessRunner> RunnerAdded;
-        public Action<ProcessRunner> RunnerRemoved;
+		public Action ProcessesChanged;
+		public Action<ProcessRunner> RunnerAdded;
+		public Action<ProcessRunner> RunnerRemoved;
 
-        public List<ProcessRunner> Runners
-        {
-            get { return processMap.Values.ToList(); }
-        }
+		public List<ProcessRunner> Runners
+		{
+			get { return processMap.Values.ToList(); }
+		}
 
-        public List<ProcessOptions> Options
-        {
-            get { return Runners.Select(x => x.ProcessOptions).ToList(); }
-        }
+		public List<ProcessOptions> Options
+		{
+			get { return Runners.Select(x => x.ProcessOptions).ToList(); }
+		}
 
-        public void Add(ProcessOptions opts)
-        {
-            if (!Contains(opts.Path))
-            {
-                ProcessRunner proc = new ProcessRunner(opts);
+		public void Add(ProcessOptions opts)
+		{
+			if (!Contains(opts.Path))
+			{
+				ProcessRunner proc = new ProcessRunner(opts);
 
-                proc.StateChanged += OnProcessesChanged;
-                proc.OptionsChanged += OnProcessesChanged;
+				proc.StateChanged += OnProcessesChanged;
+				proc.OptionsChanged += OnProcessesChanged;
 
-                processMap.Add(opts.Path, proc);
-                RunnerAdded?.Invoke(proc);
+				processMap.Add(opts.Path, proc);
+				RunnerAdded?.Invoke(proc);
 
-                OnProcessesChanged();
-            }
-        }
+				OnProcessesChanged();
+			}
+		}
 
-        public void Remove(string path)
-        {
-            if (Contains(path))
-            {
-                using (ProcessRunner proc = processMap[path])
-                {
-                    processMap.Remove(path);
-                    RunnerRemoved?.Invoke(proc);
-                }
+		public void Remove(string path)
+		{
+			if (Contains(path))
+			{
+				using (ProcessRunner proc = processMap[path])
+				{
+					processMap.Remove(path);
+					RunnerRemoved?.Invoke(proc);
+				}
 
-                OnProcessesChanged();
-            }
-        }
+				OnProcessesChanged();
+			}
+		}
 
-        public bool Contains(string path)
-        {
-            return !string.IsNullOrWhiteSpace(path) &&
-                processMap.ContainsKey(path);
-        }
+		public bool Contains(string path)
+		{
+			return !string.IsNullOrWhiteSpace(path) &&
+				processMap.ContainsKey(path);
+		}
 
-        public ProcessRunner Get(string path)
-        {
-            if (Contains(path))
-                return processMap[path];
-            else
-                return null;
-        }
+		public ProcessRunner Get(string path)
+		{
+			return Contains(path) ? processMap[path] : null;
+		}
 
-        protected void OnProcessesChanged()
-        {
-            ProcessesChanged?.Invoke();
-        }
+		protected void OnProcessesChanged()
+		{
+			ProcessesChanged?.Invoke();
+		}
 
-        #region IDisposable Support
-        public bool IsDisposed { get; private set; } = false;
+		#region IDisposable Support
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    foreach (var pair in processMap)
-                        pair.Value.Dispose();
-                }
+		public bool IsDisposed { get; private set; } = false;
 
-                IsDisposed = true;
-            }
-        }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!IsDisposed)
+			{
+				if (disposing)
+				{
+					foreach (KeyValuePair<string, ProcessRunner> pair in processMap)
+					{
+						pair.Value.Dispose();
+					}
+				}
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
+				IsDisposed = true;
+			}
+		}
 
-    }
+		public void Dispose()
+		{
+			Dispose(true);
+		}
+
+		#endregion
+	}
 }

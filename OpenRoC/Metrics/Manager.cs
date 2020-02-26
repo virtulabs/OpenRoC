@@ -1,101 +1,103 @@
 ﻿namespace oroc.Metrics
 {
-    using liboroc;
+	using liboroc;
+	using OpenHardwareMonitor.Hardware;
+	using System;
+	using System.Linq;
 
-    using System;
-    using System.Linq;
+	public class Manager : IDisposable
+	{
+		private Computer computer;
+		private ICollector cpuCollector;
+		private ICollector gpuCollector;
+		private ICollector ramCollector;
+		private ExecutorService setupService;
+		private volatile bool setupFinished;
 
-    using OpenHardwareMonitor.Hardware;
+		public double[] CpuSamples { get; private set; }
 
-    public class Manager : IDisposable
-    {
-        private Computer computer;
-        private ICollector cpuCollector;
-        private ICollector gpuCollector;
-        private ICollector ramCollector;
-        private ExecutorService setupService;
-        private volatile bool setupFinished;
+		public double[] GpuSamples { get; private set; }
 
-        public double[] CpuSamples { get; private set; }
+		public double[] RamSamples { get; private set; }
 
-        public double[] GpuSamples { get; private set; }
+		public Manager()
+		{
+			setupService = new ExecutorService();
+			setupFinished = false;
 
-        public double[] RamSamples { get; private set; }
+			var initial_sensor_value = 0.0d;
+			var initial_sensor_count = 50;
 
-        public Manager()
-        {
-            setupService = new ExecutorService();
-            setupFinished = false;
+			CpuSamples = new double[initial_sensor_count];
+			CpuSamples = Enumerable.Repeat(initial_sensor_value, initial_sensor_count).ToArray();
 
-            var initial_sensor_value = 0.0d;
-            var initial_sensor_count = 50;
+			GpuSamples = new double[initial_sensor_count];
+			GpuSamples = Enumerable.Repeat(initial_sensor_value, initial_sensor_count).ToArray();
 
-            CpuSamples = new double[initial_sensor_count];
-            CpuSamples = Enumerable.Repeat(initial_sensor_value, initial_sensor_count).ToArray();
+			RamSamples = new double[initial_sensor_count];
+			RamSamples = Enumerable.Repeat(initial_sensor_value, initial_sensor_count).ToArray();
 
-            GpuSamples = new double[initial_sensor_count];
-            GpuSamples = Enumerable.Repeat(initial_sensor_value, initial_sensor_count).ToArray();
+			setupService.Accept(() =>
+			{
+				computer = new Computer
+				{
+					CPUEnabled = true,
+					GPUEnabled = true,
+					RAMEnabled = true,
+				};
 
-            RamSamples = new double[initial_sensor_count];
-            RamSamples = Enumerable.Repeat(initial_sensor_value, initial_sensor_count).ToArray();
+				computer.Open();
 
-            setupService.Accept(() =>
-            {
-                computer = new Computer
-                {
-                    CPUEnabled = true,
-                    GPUEnabled = true,
-                    RAMEnabled = true,
-                };
+				cpuCollector = new CpuCollector(computer);
+				gpuCollector = new GpuCollector(computer);
+				ramCollector = new RamCollector(computer);
 
-                computer.Open();
+				setupFinished = true;
+			});
+		}
 
-                cpuCollector = new CpuCollector(computer);
-                gpuCollector = new GpuCollector(computer);
-                ramCollector = new RamCollector(computer);
+		public void Update()
+		{
+			if (!setupFinished)
+			{
+				return;
+			}
 
-                setupFinished = true;
-            });
-        }
+			cpuCollector.Update();
+			gpuCollector.Update();
+			ramCollector.Update();
 
-        public void Update()
-        {
-            if (!setupFinished)
-                return;
+			CpuSamples.ShiftLeft(cpuCollector.CurrentSample);
+			GpuSamples.ShiftLeft(gpuCollector.CurrentSample);
+			RamSamples.ShiftLeft(ramCollector.CurrentSample);
+		}
 
-            cpuCollector.Update();
-            gpuCollector.Update();
-            ramCollector.Update();
+		#region IDisposable Support
 
-            CpuSamples.ShiftLeft(cpuCollector.CurrentSample);
-            GpuSamples.ShiftLeft(gpuCollector.CurrentSample);
-            RamSamples.ShiftLeft(ramCollector.CurrentSample);
-        }
+		public bool IsDisposed { get; private set; } = false;
 
-        #region IDisposable Support
-        public bool IsDisposed { get; private set; } = false;
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!IsDisposed)
+			{
+				IsDisposed = true;
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                IsDisposed = true;
+				if (disposing)
+				{
+					setupService?.Dispose();
+					computer?.Close();
+				}
 
-                if (disposing)
-                {
-                    setupService?.Dispose();
-                    computer?.Close();
-                }
+				setupService = null;
+				computer = null;
+			}
+		}
 
-                setupService = null;
-                computer = null;
-            }
-        }
+		public void Dispose()
+		{
+			Dispose(true);
+		}
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
-    }
+		#endregion
+	}
 }

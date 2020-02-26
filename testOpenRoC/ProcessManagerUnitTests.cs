@@ -1,85 +1,83 @@
 ﻿namespace testOpenRoC
 {
-    using liboroc;
+	using liboroc;
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using System.Linq;
 
-    using System.Linq;
+	[TestClass]
+	public class ProcessManagerUnitTests
+	{
+		[TestMethod]
+		public void AddingRunners()
+		{
+			using (var manager = new ProcessManager())
+			{
+				int addedCount = 0;
+				bool addedEventCalled = false;
+				bool changeEventCalled = false;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+				manager.ProcessesChanged += () => { changeEventCalled = true; };
+				manager.RunnerAdded += (runner) => { addedEventCalled = true; ++addedCount; };
+				manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
 
-    [TestClass]
-    public class ProcessManagerUnitTests
-    {
-        [TestMethod]
-        public void AddingRunners()
-        {
-            using (var manager = new ProcessManager())
-            {
-                int addedCount = 0;
-                bool addedEventCalled = false;
-                bool changeEventCalled = false;
+				Assert.IsTrue(manager.Contains(ProcessRunnerUnitTests.TestProcessWindowedPath));
+				Assert.IsTrue(manager.Runners.Contains(manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath)));
+				Assert.IsTrue(manager.Options.Select(opt => opt.Path).Contains(ProcessRunnerUnitTests.TestProcessWindowedPath));
+				Assert.IsTrue(addedEventCalled);
+				Assert.IsTrue(changeEventCalled);
 
-                manager.ProcessesChanged += () => { changeEventCalled = true; };
-                manager.RunnerAdded += (runner) => { addedEventCalled = true; ++addedCount; };
-                manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
+				manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
+				Assert.AreEqual(addedCount, 1);
 
-                Assert.IsTrue(manager.Contains(ProcessRunnerUnitTests.TestProcessWindowedPath));
-                Assert.IsTrue(manager.Runners.Contains(manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath)));
-                Assert.IsTrue(manager.Options.Select(opt => opt.Path).Contains(ProcessRunnerUnitTests.TestProcessWindowedPath));
-                Assert.IsTrue(addedEventCalled);
-                Assert.IsTrue(changeEventCalled);
+				Assert.IsFalse(manager.Contains(null));
+				Assert.IsFalse(manager.Contains(""));
+			}
+		}
 
-                manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
-                Assert.AreEqual(addedCount, 1);
+		[TestMethod]
+		public void RemovingRunners()
+		{
+			using (var manager = new ProcessManager())
+			{
+				int removedCount = 0;
+				bool removedEventCalled = false;
+				bool changeEventCalled = false;
 
-                Assert.IsFalse(manager.Contains(null));
-                Assert.IsFalse(manager.Contains(""));
-            }
-        }
+				manager.RunnerRemoved += (runner) => { removedEventCalled = true; ++removedCount; };
+				manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
+				manager.ProcessesChanged += () => { changeEventCalled = true; };
 
-        [TestMethod]
-        public void RemovingRunners()
-        {
-            using (var manager = new ProcessManager())
-            {
-                int removedCount = 0;
-                bool removedEventCalled = false;
-                bool changeEventCalled = false;
+				manager.Remove(ProcessRunnerUnitTests.TestProcessWindowedPath);
+				Assert.IsTrue(removedEventCalled);
+				Assert.IsTrue(changeEventCalled);
 
-                manager.RunnerRemoved += (runner) => { removedEventCalled = true; ++removedCount; };
-                manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
-                manager.ProcessesChanged += () => { changeEventCalled = true; };
+				manager.Remove(ProcessRunnerUnitTests.TestProcessWindowedPath);
+				Assert.AreEqual(removedCount, 1);
+			}
+		}
 
-                manager.Remove(ProcessRunnerUnitTests.TestProcessWindowedPath);
-                Assert.IsTrue(removedEventCalled);
-                Assert.IsTrue(changeEventCalled);
+		[TestMethod]
+		public void DisposingRemovedRunners()
+		{
+			using (var manager = new ProcessManager())
+			{
+				manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
+				var runner = manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath);
+				manager.Remove(ProcessRunnerUnitTests.TestProcessWindowedPath);
 
-                manager.Remove(ProcessRunnerUnitTests.TestProcessWindowedPath);
-                Assert.AreEqual(removedCount, 1);
-            }
-        }
+				Assert.IsTrue(runner.IsDisposed);
+			}
+		}
 
-        [TestMethod]
-        public void DisposingRemovedRunners()
-        {
-            using (var manager = new ProcessManager())
-            {
-                manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
-                var runner = manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath);
-                manager.Remove(ProcessRunnerUnitTests.TestProcessWindowedPath);
-
-                Assert.IsTrue(runner.IsDisposed);
-            }
-        }
-
-        [TestMethod]
-        public void GettingRunners()
-        {
-            using (var manager = new ProcessManager())
-            {
-                Assert.IsNull(manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath));
-                manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
-                Assert.IsNotNull(manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath));
-            }
-        }
-    }
+		[TestMethod]
+		public void GettingRunners()
+		{
+			using (var manager = new ProcessManager())
+			{
+				Assert.IsNull(manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath));
+				manager.Add(ProcessRunnerUnitTests.ResponsiveWindowedProcessOptions);
+				Assert.IsNotNull(manager.Get(ProcessRunnerUnitTests.TestProcessWindowedPath));
+			}
+		}
+	}
 }

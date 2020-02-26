@@ -1,69 +1,64 @@
 ﻿namespace liboroc
 {
-    using System;
-    using System.Management;
-    using System.Diagnostics;
+	using System;
+	using System.Diagnostics;
+	using System.Management;
 
-    public class ProcessObserver
-    {
-        public interface IVisitor
-        {
-            void Visit(Process process);
-        }
+	public class ProcessObserver
+	{
+		private static object mutex = new object();
+		private static ProcessObserver instance;
 
-        private static object mutex = new object();
-        private static ProcessObserver instance;
+		public static ProcessObserver Instance
+		{
+			get
+			{
+				if (instance == null)
+				{
+					lock (mutex)
+					{
+						if (instance == null)
+						{
+							instance = new ProcessObserver();
+						}
+					}
+				}
 
-        public static ProcessObserver Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (mutex)
-                    {
-                        if (instance == null)
-                        {
-                            instance = new ProcessObserver();
-                        }
-                    }
-                }
+				return instance;
+			}
+		}
 
-                return instance;
-            }
-        }
+		public void Accept(Action<Process> visitor, int pid)
+		{
+			using (ExecutorService service = new ExecutorService())
+			{
+				service.Accept(() => { execute(visitor, pid); });
+			}
+		}
 
-        public void Accept(Action<Process> visitor, int pid)
-        {
-            using (ExecutorService service = new ExecutorService())
-            {
-                service.Accept(() => { execute(visitor, pid); });
-            }
-        }
+		private void execute(Action<Process> visitor, int pid)
+		{
+			string query = string.Format("Select * From Win32_Process Where ParentProcessID={0}", pid);
+			using (ManagementObjectSearcher processSearcher = new ManagementObjectSearcher(query))
+			using (ManagementObjectCollection processCollection = processSearcher.Get())
+			{
+				try
+				{
+					using (Process proc = Process.GetProcessById(pid))
+					{
+						visitor?.Invoke(proc);
+					}
+				}
+				catch { /* there is nothing we can do about it */ }
 
-        private void execute(Action<Process> visitor, int pid)
-        {
-            string query = string.Format("Select * From Win32_Process Where ParentProcessID={0}", pid);
-            using (ManagementObjectSearcher processSearcher = new ManagementObjectSearcher(query))
-            using (ManagementObjectCollection processCollection = processSearcher.Get())
-            {
-                try
-                {
-                    using (Process proc = Process.GetProcessById(pid))
-                    {
-                        visitor?.Invoke(proc);
-                    }
-                }
-                catch { /* there is nothing we can do about it */ }
-
-                if (processCollection != null)
-                {
-                    foreach (ManagementObject mo in processCollection)
-                    {
-                        execute(visitor, Convert.ToInt32(mo["ProcessID"]));
-                    }
-                }
-            }
-        }
-    }
+				if (processCollection != null)
+				{
+					foreach (ManagementObject mo in processCollection)
+					{
+						execute(visitor, Convert.ToInt32(mo["ProcessID"]));
+					}
+				}
+			}
+		}
+	}
 }

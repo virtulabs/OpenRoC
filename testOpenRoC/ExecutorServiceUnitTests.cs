@@ -1,92 +1,88 @@
 ﻿namespace testOpenRoC
 {
-    using liboroc;
+	using liboroc;
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using System;
+	using System.Threading;
 
-    using System;
-    using System.Threading;
+	[TestClass]
+	public class ExecutorServiceUnitTests
+	{
+		[TestMethod]
+		public void WaitForPending()
+		{
+			bool flag1 = false;
+			bool flag2 = false;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+			using (ExecutorService service = new ExecutorService())
+			{
+				service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag1 = true; });
+				service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag2 = true; });
+			}
 
-    [TestClass]
-    public class ExecutorServiceUnitTests
-    {
-        [TestMethod]
-        public void WaitForPending()
-        {
-            bool flag1 = false;
-            bool flag2 = false;
+			Assert.IsTrue(flag1);
+			Assert.IsTrue(flag2);
+		}
 
-            using (ExecutorService service = new ExecutorService())
-            {
-                service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag1 = true; });
-                service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag2 = true; });
-            }
+		[TestMethod]
+		public void WaitAfterException()
+		{
+			bool flag1 = false;
+			bool flag2 = false;
 
-            Assert.IsTrue(flag1);
-            Assert.IsTrue(flag2);
-        }
+			using (ExecutorService service = new ExecutorService())
+			{
+				service.Accept(() =>
+				{
+					Thread.Sleep(TimeSpan.FromSeconds(1));
+					throw new Exception();
+				});
+				service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag2 = true; });
+			}
 
-        [TestMethod]
-        public void WaitAfterException()
-        {
-            bool flag1 = false;
-            bool flag2 = false;
+			Assert.IsFalse(flag1);
+			Assert.IsTrue(flag2);
+		}
 
-            using (ExecutorService service = new ExecutorService())
-            {
-                service.Accept(() =>
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                    throw new Exception();
+		[TestMethod]
+		public void ExceptionPropagation()
+		{
+			Exception ex1 = new Exception();
+			Exception ex2 = null;
 
-                });
-                service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag2 = true; });
-            }
+			using (ExecutorService service = new ExecutorService())
+			{
+				service.ExceptionReceived += (ex) =>
+				{
+					ex2 = ex;
+				};
 
-            Assert.IsFalse(flag1);
-            Assert.IsTrue(flag2);
-        }
+				service.Accept(() =>
+				{
+					Thread.Sleep(TimeSpan.FromSeconds(1));
+					throw ex1;
+				});
+			}
 
-        [TestMethod]
-        public void ExceptionPropagation()
-        {
-            Exception ex1 = new Exception();
-            Exception ex2 = null;
+			Assert.IsTrue(ReferenceEquals(ex1, ex2));
+		}
 
-            using (ExecutorService service = new ExecutorService())
-            {
-                service.ExceptionReceived += (ex) =>
-                {
-                    ex2 = ex;
-                };
+		[TestMethod]
+		public void DiposedAccess()
+		{
+			bool flag1 = false;
+			bool flag2 = false;
 
-                service.Accept(() =>
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                    throw ex1;
+			using (ExecutorService service = new ExecutorService())
+			{
+				service.Dispose();
+				service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag1 = true; });
+				service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag2 = true; });
+				service.Wait();
+			}
 
-                });
-            }
-
-            Assert.IsTrue(ReferenceEquals(ex1, ex2));
-        }
-
-        [TestMethod]
-        public void DiposedAccess()
-        {
-            bool flag1 = false;
-            bool flag2 = false;
-
-            using (ExecutorService service = new ExecutorService())
-            {
-                service.Dispose();
-                service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag1 = true; });
-                service.Accept(() => { Thread.Sleep(TimeSpan.FromSeconds(1)); flag2 = true; });
-                service.Wait();
-            }
-
-            Assert.IsFalse(flag1);
-            Assert.IsFalse(flag2);
-        }
-    }
+			Assert.IsFalse(flag1);
+			Assert.IsFalse(flag2);
+		}
+	}
 }
