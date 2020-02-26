@@ -127,7 +127,6 @@ OpenRoC is licensed under the MIT license (MIT). OpenRoC uses a number of third-
 OHM - http://openhardwaremonitor.org/license/
 Log4Net - https://logging.apache.org/log4net/license.html
 Nancy - https://github.com/NancyFx/Nancy/blob/master/license.txt
-Costura.Fody - https://github.com/Fody/Costura/blob/master/license.txt
 JSON.NET - https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
 Microsoft .NET framework EULA - https://msdn.microsoft.com/en-us/library/ms994405.aspx
 Pranas.ScreenshotCapture - https://github.com/ScreenshotMonitor/ScreenshotCapture/blob/master/LICENSE</value>
