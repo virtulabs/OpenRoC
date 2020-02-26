@@ -3,7 +3,7 @@
 	using System;
 	using System.Runtime.InteropServices;
 
-	internal static class NativeMethods
+	public static class NativeMethods
 	{
 		[Flags]
 		public enum SetWindowPosFlags : uint
@@ -29,5 +29,8 @@
 
 		[DllImport("user32.dll")]
 		public static extern IntPtr GetForegroundWindow();
+
+		[DllImport("user32.dll")]
+		public static extern bool SetProcessDPIAware();
 	}
 }

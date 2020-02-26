@@ -1,5 +1,6 @@
 ﻿namespace oroc
 {
+	using liboroc;
 	using System;
 	using System.IO;
 	using System.Reflection;
@@ -55,11 +56,8 @@
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			SetProcessDPIAware();
+			NativeMethods.SetProcessDPIAware();
 			Application.Run(new MainDialog());
 		}
-
-		[DllImport("user32.dll")]
-		private static extern bool SetProcessDPIAware();
 	}
 }
