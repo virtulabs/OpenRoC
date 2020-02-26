@@ -3,18 +3,28 @@
 	using System;
 	using System.IO;
 	using System.Reflection;
+	using System.Runtime.InteropServices;
 	using System.Threading;
 	using System.Windows.Forms;
 
 	internal static class Program
 	{
+		public static string Directory
+		{
+			get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); }
+		}
+
+		public static string ScreenShotDirectory
+		{
+			get { return Path.Combine(Directory, ".ScreenShots"); }
+		}
+
 		[STAThread]
 		private static int Main()
 		{
 			if (Settings.Instance.IsSingleInsntaceEnabled)
 			{
-				bool only_instance;
-				using (Mutex applock = new Mutex(true, Properties.Resources.OpenRoCMutexName, out only_instance))
+				using (Mutex applock = new Mutex(true, Properties.Resources.OpenRoCMutexName, out bool only_instance))
 				{
 					if (!only_instance)
 					{
@@ -45,17 +55,11 @@
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
+			SetProcessDPIAware();
 			Application.Run(new MainDialog());
 		}
 
-		public static string Directory
-		{
-			get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); }
-		}
-
-		public static string ScreenShotDirectory
-		{
-			get { return Path.Combine(Directory, ".ScreenShots"); }
-		}
+		[DllImport("user32.dll")]
+		private static extern bool SetProcessDPIAware();
 	}
 }
