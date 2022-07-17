@@ -5,7 +5,10 @@
 	using System.ComponentModel;
 	using System.Xml.Serialization;
 
-	public class ProcessOptions : INotifyPropertyChanged, ICloneable
+    /// <summary>
+    /// Holds launch options of a Process
+    /// </summary>
+    public class ProcessOptions : INotifyPropertyChanged, ICloneable
 	{
 		#region private data holders
 
@@ -71,9 +74,12 @@
 			initialState = ProcessRunner.Status.Stopped;
 		}
 
-		#region DataBind accessible properties
+        #region DataBind accessible properties
 
-		public string Path
+        /// <summary>
+        /// Path to Process executable. It must be an executable (.exe)
+        /// </summary>
+        public string Path
 		{
 			get { return path; }
 			set
@@ -86,7 +92,10 @@
 			}
 		}
 
-		public string WorkingDirectory
+        /// <summary>
+        /// Working directory of the Process
+        /// </summary>
+        public string WorkingDirectory
 		{
 			get { return workingDirectory; }
 			set
@@ -99,7 +108,10 @@
 			}
 		}
 
-		public bool CrashedIfNotRunning
+        /// <summary>
+        /// Assume Process is crashed if it's stopped (and state is running)
+        /// </summary>
+        public bool CrashedIfNotRunning
 		{
 			get { return crashedIfNotRunning; }
 			set
@@ -112,7 +124,10 @@
 			}
 		}
 
-		public bool CrashedIfUnresponsive
+        /// <summary>
+        /// Assume Process is crashed if its GUI is unresponsive
+        /// </summary>
+        public bool CrashedIfUnresponsive
 		{
 			get { return crashedIfUnresponsive; }
 			set
@@ -125,7 +140,11 @@
 			}
 		}
 
-		public bool DoubleCheckEnabled
+        /// <summary>
+        /// Double check after a period of time before assuming an unresponsive
+        /// Process is crashed. Period is set via ProcessOptions.DoubleCheckDuration
+        /// </summary>
+        public bool DoubleCheckEnabled
 		{
 			get { return doubleCheckEnabled; }
 			set
@@ -138,7 +157,10 @@
 			}
 		}
 
-		public uint DoubleCheckDuration
+        /// <summary>
+        /// Timer period of ProcessOptions.DoubleCheckEnabled feature
+        /// </summary>
+        public uint DoubleCheckDuration
 		{
 			get { return doubleCheckDuration; }
 			set
@@ -151,7 +173,11 @@
 			}
 		}
 
-		public bool GracePeriodEnabled
+        /// <summary>
+        /// Wait a period of time before attempting to restart a crashed Process
+        /// Period is set via ProcessOptions.GracePeriodDuration
+        /// </summary>
+        public bool GracePeriodEnabled
 		{
 			get { return gracePeriodEnabled; }
 			set
@@ -164,7 +190,10 @@
 			}
 		}
 
-		public uint GracePeriodDuration
+        /// <summary>
+        /// Timer period of ProcessOptions.GracePeriodEnabled feature
+        /// </summary>
+        public uint GracePeriodDuration
 		{
 			get { return gracePeriodDuration; }
 			set
@@ -177,7 +206,10 @@
 			}
 		}
 
-		public bool PreLaunchScriptEnabled
+        /// <summary>
+        /// Enables pre-start event feature
+        /// </summary>
+        public bool PreLaunchScriptEnabled
 		{
 			get { return preLaunchScriptEnabled; }
 			set
@@ -190,7 +222,10 @@
 			}
 		}
 
-		public string PreLaunchScriptPath
+        /// <summary>
+        /// Pre-start event script path to be shell executed
+        /// </summary>
+        public string PreLaunchScriptPath
 		{
 			get { return preLaunchScriptPath; }
 			set
@@ -203,7 +238,11 @@
 			}
 		}
 
-		public bool AggressiveCleanupEnabled
+        /// <summary>
+        /// Perform an aggressive cleanup to shutdown a Process. This is recommended
+        /// to stay true since it cleans up after the Process and child Processes.
+        /// </summary>
+        public bool AggressiveCleanupEnabled
 		{
 			get { return aggressiveCleanupEnabled; }
 			set
@@ -216,7 +255,10 @@
 			}
 		}
 
-		public bool PostCrashScriptEnabled
+        /// <summary>
+        /// Enables post-stop/crash event feature
+        /// </summary>
+        public bool PostCrashScriptEnabled
 		{
 			get { return postCrashScriptEnabled; }
 			set
@@ -229,7 +271,10 @@
 			}
 		}
 
-		public string PostCrashScriptPath
+        /// <summary>
+        /// Post-stop/crash event script path to be shell executed
+        /// </summary>
+        public string PostCrashScriptPath
 		{
 			get { return postCrashScriptPath; }
 			set
@@ -242,7 +287,11 @@
 			}
 		}
 
-		public bool ScreenShotEnabled
+        /// <summary>
+        /// If true, a screen shot of all monitors will be taken after a Process
+        /// crashes or stops
+        /// </summary>
+        public bool ScreenShotEnabled
 		{
 			get { return screenShotEnabled; }
 			set
@@ -255,7 +304,10 @@
 			}
 		}
 
-		public bool AlwaysOnTopEnabled
+        /// <summary>
+        /// Keeps the Process Window always on-top
+        /// </summary>
+        public bool AlwaysOnTopEnabled
 		{
 			get { return alwaysOnTopEnabled; }
 			set
@@ -268,7 +320,10 @@
 			}
 		}
 
-		public bool CommandLineEnabled
+        /// <summary>
+        /// Enables passing command line to the Process
+        /// </summary>
+        public bool CommandLineEnabled
 		{
 			get { return commandLineEnabled; }
 			set
@@ -281,7 +336,10 @@
 			}
 		}
 
-		public string CommandLine
+        /// <summary>
+        /// Command line text to be passed to the Process
+        /// </summary>
+        public string CommandLine
 		{
 			get { return commandLine; }
 			set
@@ -294,7 +352,10 @@
 			}
 		}
 
-		public bool EnvironmentVariablesEnabled
+        /// <summary>
+        /// Enables merging environment variables with the Process
+        /// </summary>
+        public bool EnvironmentVariablesEnabled
 		{
 			get { return environmentVariablesEnabled; }
 			set
@@ -307,7 +368,10 @@
 			}
 		}
 
-		public string EnvironmentVariables
+        /// <summary>
+        /// Merged environment variables with the Process
+        /// </summary>
+        public string EnvironmentVariables
 		{
 			get { return environmentVariables.ToColonDelimitedString(); }
 			set
@@ -317,7 +381,11 @@
 			}
 		}
 
-		public string InitialState
+        /// <summary>
+        /// Returns InitialStateEnumValue as a string. Can also be
+        /// assigned from a string (not case sensitive)
+        /// </summary>
+        public string InitialState
 		{
 			get { return initialState.ToString(); }
 			set
@@ -339,7 +407,10 @@
 			}
 		}
 
-		[XmlIgnore]
+        /// <summary>
+        /// Initial state of the Process after ProcessRunner construction
+        /// </summary>
+        [XmlIgnore]
 		public ProcessRunner.Status InitialStateEnumValue
 		{
 			get { return initialState; }
@@ -353,17 +424,21 @@
 			}
 		}
 
-		[XmlIgnore]
+        /// <summary>
+        /// EnvironmentVariables in the form of a hash-table
+        /// </summary>
+        [XmlIgnore]
 		public Dictionary<string, string> EnvironmentVariablesDictionary
 		{
 			get { return environmentVariables; }
 		}
 
-		#endregion
+        #endregion
 
-		#region ICloneable support
+        #region ICloneable support
 
-		public object Clone()
+        //! @cond
+        public object Clone()
 		{
 			ProcessOptions clone = new ProcessOptions(environmentVariables);
 
@@ -389,18 +464,21 @@
 
 			return clone;
 		}
+        //! @endcond
 
-		#endregion
+        #endregion
 
-		#region INotifyPropertyChanged support
+        #region INotifyPropertyChanged support
 
-		public event PropertyChangedEventHandler PropertyChanged;
+        //! @cond
+        public event PropertyChangedEventHandler PropertyChanged;
 
 		protected void NotifyPropertyChanged(string propertyName)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
+        //! @endcond
 
-		#endregion
-	}
+        #endregion
+    }
 }
