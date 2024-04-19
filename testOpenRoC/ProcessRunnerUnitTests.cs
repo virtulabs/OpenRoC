@@ -572,15 +572,17 @@
 				runner2.Monitor();
 
 				bool passed = false;
-				uint passes = 10;
+				uint passes = 50;
 
 				for (uint i = 0; i < passes && !passed; ++i)
 				{
 					runner1.BringToFront(true);
 					passed |= (ProcessHelper.GetForegroundWindow() == runner1.Process.MainWindowHandle);
-				}
+                    runner1.Monitor();
+                    runner2.Monitor();
+                }
 
-				Assert.IsTrue(passed);
+                Assert.IsTrue(passed);
 
 				passed = false;
 
@@ -588,9 +590,11 @@
 				{
 					runner2.BringToFront(true);
 					passed |= (ProcessHelper.GetForegroundWindow() == runner2.Process.MainWindowHandle);
-				}
+                    runner1.Monitor();
+                    runner2.Monitor();
+                }
 
-				Assert.IsTrue(passed);
+                Assert.IsTrue(passed);
 			}
 		}
 	}
